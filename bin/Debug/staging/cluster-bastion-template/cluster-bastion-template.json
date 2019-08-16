@@ -11,11 +11,11 @@
     },
     "adminUsername": {
       "type": "string",
-      "defaultValue": "SitaAdmin"
+      "defaultValue": "[parameters('adminUsername')]"
     },
     "adminPassword": {
       "type": "securestring",
-      "defaultValue": "randomSITAadmin@1"
+      "defaultValue": "[parameters('adminPassword')]"
     },
     "domainNameLabel": {
       "type": "string",
@@ -67,11 +67,11 @@
     "virtualNetworkName": "VNet",
   "TS-Size": {
       "medium": {
-      "vmSize": "Standard_D1_v2",
+      "VMssize": "Standard_D1_v2",
       "maxScale": 1
       },
       "large": {
-      "vmSize": "Standard_D2_v2",
+      "VMSize": "Standard_D2_v2",
       "maxScale": 1
       }
   },

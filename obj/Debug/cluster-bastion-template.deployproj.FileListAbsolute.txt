@@ -1,0 +1,1 @@
+C:\AzureRepo\bastion\cluster-bastion-template\obj\Debug\cluster-bastion-template.deployproj.CoreCompileInputs.cache

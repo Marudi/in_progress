@@ -2,20 +2,11 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "adminPassword": {
-      "value": "GET_PASSWORD"
-    },
-    "adminUsername": {
-      "value": "GET_USER"
-    },
-    "environmentSize": {
-      "value": "medium"
-    },
     "location": {
       "value": "eastus"
     },
     "networkInterfaceName": {
-      "value": "VM-Bastion"
+      "value": null
     },
     "networkSecurityGroupName": {
       "value": "NSG-Bastion"
@@ -39,32 +30,49 @@
         }
       ]
     },
-    "osDiskType": {
-      "value": "Standard_LRS"
+    "subnetName": {
+      "value": null
+    },
+    "virtualNetworkId": {
+      "value": "/subscriptions/e41175ed-6a67-4405-99ed-aba0079b6a5c/resourceGroups/ASPlatform-AzureDemo/providers/Microsoft.Network/virtualNetworks/VNet"
     },
     "publicIpAddressName": {
-      "value": "IP-Bastion"
-    },
-    "publicIpAddressSku": {
-      "value": "Basic"
+      "value": null
     },
     "publicIpAddressType": {
       "value": "Static"
     },
-    "subnetName": {
-      "value": "Subnet-Management"
+    "publicIpAddressSku": {
+      "value": "Basic"
     },
     "virtualMachineName": {
-      "value": "VM-Bastion"
+      "value": null
     },
     "virtualMachineRG": {
-      "value": "DevOpsPoc"
+      "value": null
+    },
+    "osDiskType": {
+      "value": "Standard_LRS"
     },
     "virtualMachineSize": {
       "value": "Standard_DS1_v2"
     },
-    "virtualNetworkId": {
-      "value": "/subscriptions/e41175ed-6a67-4405-99ed-aba0079b6a5c/resourceGroups/ASPlatform-AzureDemo/providers/Microsoft.Network/virtualNetworks/VNet"
+    "EnvironmentSize": {
+      "type": "string",
+        "defaultValue": "medium",
+        "allowedValues" : [
+            "medium",
+            "large"
+      ],
+      "metadata": {
+        "description": "Medium for Standard deployes aand Large for higher work loads"
+          }
+    },
+    "adminUsername": {
+      "value": "adminUser"
+    },
+    "adminPassword": {
+      "value": null
     }
   }
 }
