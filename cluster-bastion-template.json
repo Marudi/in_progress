@@ -62,6 +62,16 @@
   },
   "variables": {
     "virtualNetworkName": "VNet",
+  "TS-Size": {
+      "medium": {
+      "VMssize": "Standard_D1_v2",
+      "maxScale": 1
+      },
+      "large": {
+      "VMSize": "Standard_D2_v2",
+      "maxScale": 1
+      }
+  },
     "subnetName": "Subnet-Management",
     "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
     "subnetRef": "[concat(variables('vnetId'), '/subnets/', variables('subnetName'))]",

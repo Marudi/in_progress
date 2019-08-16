@@ -57,6 +57,17 @@
     "virtualMachineSize": {
       "value": "Standard_DS1_v2"
     },
+    "EnvironmentSize": {
+      "type": "string",
+        "defaultValue": "medium",
+        "allowedValues" : [
+            "medium",
+            "large"
+      ],
+      "metadata": {
+        "description": "Medium for Standard deployes aand Large for higher work loads"
+          }
+    },
     "adminUsername": {
       "value": "adminUser"
     },
