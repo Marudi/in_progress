@@ -23,6 +23,18 @@
                 "description": "PWD of Administrator user on the VM"
             }
         },
+        "autoShutdown": {
+            "type": "string",
+            "defaultValue": "6:00PM",
+            "allowedValues": [
+                "6:00PM",
+                "5:00PM"
+            ],
+            "metadata": {
+                "description": "Medium for regular development. Large for Machine Learning development"
+            }
+        }
+    },
         "EnvironmentSize": {
             "type": "string",
             "defaultValue": "medium",
@@ -54,13 +66,19 @@
         "diagnosticsStorageAccountType": "Standard_LRS",
         "diagnosticsStorageAccountKind": "Storage",
         "addressPrefix": "10.0.0.0/24",
-        "subnetName": "default",
+        "subnetName": "[toLower(concat(variables('resourceGroupName'),'-Subnet-', variables('suffix')))]",
         "subnetPrefix": "10.0.0.0/24",
         "publicIpAddressName": "[toLower(concat(variables('VMName'),'-ip-', variables('suffix')))]",
         "publicIpAddressType": "Dynamic",
         "publicIpAddressSku": "Basic",
         "autoShutdownStatus": "Enabled",
-        "autoShutdownTime": "18:00",
+        "autoShutdown": {
+            "6:00PM":{
+                "autoShutdownTime": "18:00"
+            },
+            "5:00PM":{
+                "autoShutdownTime": "17:00"
+            },
         "autoShutdownTimeZone": "Eastern Standard Time",
         "autoShutdownNotificationStatus": "Disabled",
         "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
