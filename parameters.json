@@ -1,0 +1,67 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "value": "eastus"
+    },
+    "networkInterfaceName": {
+      "value": null
+    },
+    "networkSecurityGroupName": {
+      "value": "NSG-Bastion"
+    },
+    "networkSecurityGroupRules": {
+      "value": [
+        {
+          "name": "default-allow-rdp",
+          "properties": {
+            "priority": 1000,
+            "protocol": "TCP",
+            "access": "Allow",
+            "direction": "Inbound",
+            "sourceApplicationSecurityGroups": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceAddressPrefix": "*",
+            "sourcePortRange": "*",
+            "destinationAddressPrefix": "*",
+            "destinationPortRange": "3389"
+          }
+        }
+      ]
+    },
+    "subnetName": {
+      "value": null
+    },
+    "virtualNetworkId": {
+      "value": "/subscriptions/e41175ed-6a67-4405-99ed-aba0079b6a5c/resourceGroups/ASPlatform-AzureDemo/providers/Microsoft.Network/virtualNetworks/VNet"
+    },
+    "publicIpAddressName": {
+      "value": null
+    },
+    "publicIpAddressType": {
+      "value": "Static"
+    },
+    "publicIpAddressSku": {
+      "value": "Basic"
+    },
+    "virtualMachineName": {
+      "value": null
+    },
+    "virtualMachineRG": {
+      "value": null
+    },
+    "osDiskType": {
+      "value": "Standard_LRS"
+    },
+    "virtualMachineSize": {
+      "value": "Standard_DS1_v2"
+    },
+    "adminUsername": {
+      "value": "adminUser"
+    },
+    "adminPassword": {
+      "value": null
+    }
+  }
+}
