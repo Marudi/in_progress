@@ -9,14 +9,6 @@
     "privateIpAddress": {
       "type": "string"
     },
-    "virtualMachineSize": {
-      "type": "string",
-      "defaultValue": "Standard_D1_v2",
-      "allowedValues": [
-        "Standard_D1_v2",
-        "Standard_D2_v2"
-      ]
-    },
     "adminUsername": {
       "type": "string",
       "defaultValue": "[parameters('adminUsername')]"
@@ -31,6 +23,17 @@
         "description": ".eastus.cloudapp.azure.com"
       }
     },
+    "EnvironmentSize": {
+      "type": "string",
+        "defaultValue": "medium",
+        "allowedValues" : [
+            "medium",
+            "large"
+      ],
+      "metadata": {
+        "description": "Medium for Standard deployes aand Large for higher work loads"
+          }
+    },
     "autoShutdownStatus": {
       "type": "string",
       "allowedValues": [
@@ -44,7 +47,7 @@
       "defaultValue": "18:00",
       "allowedValues": [
         "18:00",
-                  
+        "20:00"          
       ]
     },
     "autoShutdownTimeZone": {
@@ -73,6 +76,7 @@
       }
   },
     "subnetName": "Subnet-Management",
+    "vmSize": "[variables('TS-Size')[parameters('EnvironmentSize')].VMSize]",
     "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
     "subnetRef": "[concat(variables('vnetId'), '/subnets/', variables('subnetName'))]",
     "location": "[resourceGroup().location]",
@@ -103,7 +107,7 @@
           }
         },
         "hardwareProfile": {
-          "vmSize": "[parameters('virtualMachineSize')]"
+          "vmSize": "[variables('TS-Size')[parameters('EnvironmentSize')].VMSize]"
         },
         "storageProfile": {
           "imageReference": {
