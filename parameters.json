@@ -3,10 +3,15 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "adminPassword": {
-      "value": "GET_PASSWORD"
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/e41175ed-6a67-4405-99ed-aba0079b6a5c/resourceGroups/DevOpsTeams/providers/Microsoft.KeyVault/vaults/PipelineCredentials"
+        },
+        "secretName": "adminPassword"
+      }
     },
     "adminUsername": {
-      "value": "GET_USER"
+      "value": "\u003ckeyVault: PipelineCredentials/adminUsername\u003e"
     },
     "environmentSize": {
       "value": "medium"
@@ -65,6 +70,15 @@
     },
     "virtualNetworkId": {
       "value": "/subscriptions/e41175ed-6a67-4405-99ed-aba0079b6a5c/resourceGroups/ASPlatform-AzureDemo/providers/Microsoft.Network/virtualNetworks/VNet"
+    },
+    "autoShutdownTime": {
+      "value": "18:00"
+    },
+    "autoShutdownNotificationStatus": {
+      "value": "Enabled"
+    },
+    "domainNameLabel": {
+      "value": "sitaIP"
     }
   }
 }

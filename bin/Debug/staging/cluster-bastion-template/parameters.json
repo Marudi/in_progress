@@ -2,11 +2,25 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "adminPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/e41175ed-6a67-4405-99ed-aba0079b6a5c/resourceGroups/DevOpsTeams/providers/Microsoft.KeyVault/vaults/PipelineCredentials"
+        },
+        "secretName": "adminPassword"
+      }
+    },
+    "adminUsername": {
+      "value": "\u003ckeyVault: PipelineCredentials/adminUsername\u003e"
+    },
+    "environmentSize": {
+      "value": "medium"
+    },
     "location": {
       "value": "eastus"
     },
     "networkInterfaceName": {
-      "value": null
+      "value": "VM-Bastion"
     },
     "networkSecurityGroupName": {
       "value": "NSG-Bastion"
@@ -30,49 +44,41 @@
         }
       ]
     },
-    "subnetName": {
-      "value": null
-    },
-    "virtualNetworkId": {
-      "value": "/subscriptions/e41175ed-6a67-4405-99ed-aba0079b6a5c/resourceGroups/ASPlatform-AzureDemo/providers/Microsoft.Network/virtualNetworks/VNet"
+    "osDiskType": {
+      "value": "Standard_LRS"
     },
     "publicIpAddressName": {
-      "value": null
-    },
-    "publicIpAddressType": {
-      "value": "Static"
+      "value": "IP-Bastion"
     },
     "publicIpAddressSku": {
       "value": "Basic"
     },
+    "publicIpAddressType": {
+      "value": "Static"
+    },
+    "subnetName": {
+      "value": "Subnet-Management"
+    },
     "virtualMachineName": {
-      "value": null
+      "value": "VM-Bastion"
     },
     "virtualMachineRG": {
-      "value": null
-    },
-    "osDiskType": {
-      "value": "Standard_LRS"
+      "value": "DevOpsPoc"
     },
     "virtualMachineSize": {
       "value": "Standard_DS1_v2"
     },
-    "EnvironmentSize": {
-      "type": "string",
-        "defaultValue": "medium",
-        "allowedValues" : [
-            "medium",
-            "large"
-      ],
-      "metadata": {
-        "description": "Medium for Standard deployes aand Large for higher work loads"
-          }
+    "virtualNetworkId": {
+      "value": "/subscriptions/e41175ed-6a67-4405-99ed-aba0079b6a5c/resourceGroups/ASPlatform-AzureDemo/providers/Microsoft.Network/virtualNetworks/VNet"
     },
-    "adminUsername": {
-      "value": "adminUser"
+    "autoShutdownTime": {
+      "value": "18:00"
     },
-    "adminPassword": {
-      "value": null
+    "autoShutdownNotificationStatus": {
+      "value": "Enabled"
+    },
+    "domainNameLabel": {
+      "value": "sitaIP"
     }
   }
 }
