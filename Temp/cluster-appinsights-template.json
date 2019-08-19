@@ -1,0 +1,44 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "domainNameLabel": {
+      "type":"string"
+    },
+    "environment": {
+      "type": "string",
+      "metadata": {
+        "description": "Deployment environment"
+      }
+    },
+    "type": {
+      "type": "string",
+      "defaultValue": "ASP.NET"
+    },
+    "requestSource": {
+      "type": "string",
+      "defaultValue": "IbizaAIExtension"
+    }
+  },
+  "variables": {
+    "name": "[tolower(concat(parameters('domainNameLabel'),'-',toUpper(parameters('environment'))))]",
+    "location": "[resourceGroup().location]",
+    "locationName": "[resourceGroup().location]"
+  },
+  "resources": [
+    {
+      "name": "[variables('name')]",
+      "type": "microsoft.insights/components",
+      "location": "[variables('location')]",
+      "apiVersion": "2014-08-01",
+      "properties": {
+        "ApplicationId": "[variables('name')]",
+        "Application_Type": "[parameters('type')]",
+        "HockeyAppToken": "",
+        "HockeyAppId": "",
+        "Flow_Type": "Redfield",
+        "Request_Source": "[parameters('requestSource')]"
+      }
+    }
+  ]
+}

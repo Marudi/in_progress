@@ -1,0 +1,51 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "domainNameLabel": {
+      "type":"string"
+    },
+    "environment": {
+      "type": "string",
+      "metadata": {
+        "description": "Deployment environment"
+      }
+    },
+    "skuName": {
+      "type": "string",
+      "defaultValue": "Standard"
+    },
+    "skuFamily": {
+      "type": "string",
+      "defaultValue": "C"
+    },
+    "skuCapacity": {
+      "type": "int",
+      "defaultValue": 1
+    }
+  },
+  "variables": {
+    "accountName": "[tolower(concat(parameters('domainNameLabel'), '-', tolower(parameters('environment'))))]",
+    "location": "[resourceGroup().location]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2017-10-01",
+      "type": "Microsoft.Cache/Redis",
+      "name": "[variables('accountName')]",
+      "location": "[variables('location')]",
+      "properties": {
+        "sku": {
+          "name": "[parameters('skuName')]",
+          "family": "[parameters('skuFamily')]",
+          "capacity": "[parameters('skuCapacity')]"
+        },
+        "redisConfiguration": {
+          "maxclients": "1000",
+          "maxmemory-policy": "volatile-lru"
+        },
+        "enableNonSslPort": false
+      }
+    }
+  ]
+}
