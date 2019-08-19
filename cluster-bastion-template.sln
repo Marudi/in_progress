@@ -5,6 +5,11 @@ VisualStudioVersion = 16.0.29209.62
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "cluster-bastion-template", "cluster-bastion-template.deployproj", "{1528FE79-D051-4956-BDEF-DB0FAFA1314E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AF6ECDFE-46B8-4EFA-9467-7D95D5334B82}"
+	ProjectSection(SolutionItems) = preProject
+		SingleVM.json = SingleVM.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

@@ -14,13 +14,13 @@
         "adminUsername": {
             "type": "string",
             "metadata": {
-                "description": "Name of Administrator user on the VM - Atatched to KeyVault via Parameters file"
+                "description": "Name of Administrator user on the VM"
             }
         },
         "adminPassword": {
             "type": "securestring",
             "metadata": {
-                "description": "PWD of Administrator user on the VM - Atatched to KeyVault via Parameters file"
+                "description": "PWD of Administrator user on the VM"
             }
         },
         "EnvironmentSize": {

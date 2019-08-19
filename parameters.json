@@ -79,6 +79,9 @@
     },
     "domainNameLabel": {
       "value": "sitaIP"
+    },
+    "EnvironmentSize": {
+      "value": "medium"
     }
   }
 }
