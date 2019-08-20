@@ -5,6 +5,10 @@
     "domainNameLabel": {
       "type":"string"
     },
+    "appInsightsName": {
+      "defaultValue": "asplatform-azuredemo",
+      "type": "String"
+    },
     "environment": {
       "type": "string",
       "metadata": {
@@ -15,6 +19,54 @@
       "type": "string",
       "defaultValue": "ASP.NET"
     },
+    "appLocation": {
+      "type": "string",
+      "defaultValue": "East US",
+      "allowedValues": [
+          "South Central US",
+          "West Europe",
+          "East US",
+          "North Europe"
+      ],
+      "metadata": {
+          "description": "Enter the application location."
+      }
+    },
+    "priceCode": {
+        "type": "int",
+        "defaultValue": 1,
+        "allowedValues": [
+            1,
+            2
+        ],
+        "metadata": {
+            "description": "1 = Per GB (Basic), 2 = Per Node (Enterprise)"
+        }
+    },
+    "dailyQuota": {
+        "type": "int",
+        "defaultValue": 50,
+        "minValue": 1,
+        "metadata": {
+            "description": "Enter daily quota in GB."
+        }
+    },
+    "dailyQuotaResetTime": {
+        "type": "int",
+        "defaultValue": 12,
+        "metadata": {
+            "description": "Enter daily quota reset hour in UTC (0 to 23). Values outside the range will get a random reset hour."
+        }
+    },
+    "warningThreshold": {
+        "type": "int",
+        "defaultValue": 90,
+        "minValue": 1,
+        "maxValue": 100,
+        "metadata": {
+            "description": "Enter the % value of daily quota after which warning mail to be sent. "
+        }
+    },    
     "requestSource": {
       "type": "string",
       "defaultValue": "IbizaAIExtension"
@@ -22,23 +74,49 @@
   },
   "variables": {
     "name": "[tolower(concat(parameters('domainNameLabel'),'-',toUpper(parameters('environment'))))]",
+    "priceArray": [
+      "Basic",
+      "Application Insights Enterprise"
+      ],
     "location": "[resourceGroup().location]",
-    "locationName": "[resourceGroup().location]"
+    "locationName": "[variables('location')]",
+    "pricePlan": "[take(variables('priceArray'),parameters('priceCode'))]",
+    "billingplan": "[concat(variables('name'),'/', variables('pricePlan')[0])]"
   },
   "resources": [
     {
-      "name": "[variables('name')]",
-      "type": "microsoft.insights/components",
-      "location": "[variables('location')]",
-      "apiVersion": "2014-08-01",
-      "properties": {
-        "ApplicationId": "[variables('name')]",
-        "Application_Type": "[parameters('type')]",
-        "HockeyAppToken": "",
-        "HockeyAppId": "",
-        "Flow_Type": "Redfield",
-        "Request_Source": "[parameters('requestSource')]"
-      }
+        "type": "microsoft.insights/components",
+        "kind": "[parameters('type')]",
+        "name": "[parameters('appInsightsName')]",
+        "apiVersion": "2015-05-01",
+        "location": "[parameters('appLocation')]",
+        "tags": {},
+        "properties": {
+          "ApplicationId": "[variables('name')]",
+          "Application_Type": "ASP.NET",
+          "HockeyAppToken": "",
+          "HockeyAppId": "",
+          "Flow_Type": "Redfield",
+          "Request_Source": "[parameters('requestSource')]"
+        },
+        "dependsOn": []
+    },
+    {
+        "name": "[variables('billingplan')]",
+        "type": "microsoft.insights/components/CurrentBillingFeatures",
+        "location": "[variables('locationName')]",
+        "apiVersion": "2015-05-01",
+        "dependsOn": [
+            "[resourceId('microsoft.insights/components', parameters('appInsightsName'))]"
+        ],
+        "properties": {
+            "CurrentBillingFeatures": "[variables('pricePlan')]",
+            "DataVolumeCap": {
+                "Cap": "[parameters('dailyQuota')]",
+                "WarningThreshold": "[parameters('warningThreshold')]",
+                "ResetTime": "[parameters('dailyQuotaResetTime')]"
+            }
+        }
     }
-  ]
+]
 }
