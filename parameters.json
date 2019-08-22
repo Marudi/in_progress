@@ -82,6 +82,27 @@
     },
     "EnvironmentSize": {
       "value": "medium"
+    },
+    "domainNameLabel": {
+      "value": "string"
+    },
+    "appInsightsName": {
+      "value": "String"
+    },
+    "priceCode": {
+      "value": 1,
+    },
+    "dailyQuota": {
+      "value": 50,
+    },
+    "dailyQuotaResetTime": {
+      "value": 12,
+    },
+    "warningThreshold": {
+      "value": 1,
     }
+  },
+  "requestSource": {
+    "value": "string",
   }
 }
