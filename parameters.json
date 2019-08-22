@@ -25,25 +25,6 @@
     "networkSecurityGroupName": {
       "value": "NSG-Bastion"
     },
-    "networkSecurityGroupRules": {
-      "value": [
-        {
-          "name": "default-allow-rdp",
-          "properties": {
-            "priority": 1000,
-            "protocol": "TCP",
-            "access": "Allow",
-            "direction": "Inbound",
-            "sourceApplicationSecurityGroups": [],
-            "destinationApplicationSecurityGroups": [],
-            "sourceAddressPrefix": "*",
-            "sourcePortRange": "*",
-            "destinationAddressPrefix": "*",
-            "destinationPortRange": "3389"
-          }
-        }
-      ]
-    },
     "osDiskType": {
       "value": "Standard_LRS"
     },
@@ -80,29 +61,23 @@
     "domainNameLabel": {
       "value": "sitaIP"
     },
-    "EnvironmentSize": {
-      "value": "medium"
-    },
-    "domainNameLabel": {
-      "value": "string"
-    },
     "appInsightsName": {
       "value": "String"
     },
     "priceCode": {
-      "value": 1,
+      "value": 1
     },
     "dailyQuota": {
-      "value": 50,
+      "value": 50
     },
     "dailyQuotaResetTime": {
-      "value": 12,
+      "value": 12
     },
     "warningThreshold": {
-      "value": 1,
+      "value": 1
+    },
+    "requestSource": {
+      "value": "string"
     }
-  },
-  "requestSource": {
-    "value": "string",
   }
 }
