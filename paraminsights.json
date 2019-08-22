@@ -4,6 +4,12 @@
     "parameters": {
         "appInsightsName": {
             "value": "asplatform-azuredemo"
+        },
+        "domainNameLabel": {
+            "value":"sitatest"
+        },
+        "environment": {
+            "value":"deploy"
         }
     }
 }
