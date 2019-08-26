@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "capacity": {
+      "value": 1
+    },
+    "baseInstanceName": {
+      "value": "demo"
+    },
+    "environment": {
+      "value": "demo"
+    },
+    "environmentSize": {
+      "value": "Standard_Small"
+    },
+    "backendIpAddress1": {
+      "value": null
+    },
+    "backendIpAddress2": {
+      "value": null
+    },
+    "frontendCertPassword": {
+      "value": "demo"
+    },
+    "tier": {
+      "value": "Standard"
+    }
+  }
+}

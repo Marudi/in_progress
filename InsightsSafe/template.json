@@ -10,11 +10,11 @@
         },
         "appType": {
             "type": "string",
-            "defaultValue": "web",
+            "defaultValue": "ASP.NET",
             "allowedValues": [
                 "web",
                 "java",
-                "other"
+                "ASP.NET"
             ],
             "metadata": {
                 "description": "Enter the application type."
