@@ -1,0 +1,83 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "domainNameLabel": {
+      "type": "string"
+    },
+    "environment": {
+      "type": "string",
+      "metadata": {
+        "description": "Deployment environment"
+      }
+    },
+    "environmentSize": {
+      "type": "string",
+      "defaultValue": "small-dev",
+      "allowedValues": [
+        "small",
+        "small-dev",
+        "medium",
+        "medium-dev",
+        "large"
+      ],
+      "metadata": {
+        "description": "Medium for Standard deployes aand Large for higher work loads"
+      }
+    }
+  },
+  "variables": {
+    "accountName": "[tolower(concat(parameters('domainNameLabel'), '-', tolower(parameters('environment'))))]",
+    "location": "[resourceGroup().location]",
+    "ts_size": {
+      "small-dev": {
+        "skuName": "Basic",
+        "skuCapacity": 0,
+        "skuFamily": "C"
+      },
+      "medium-dev": {
+        "skuName": "Basic",
+        "skuCapacity": 1,
+        "skuFamily": "C"
+      },
+      "small": {
+        "skuName": "Standard",
+        "skuCapacity": 0,
+        "skuFamily": "C"
+      },
+      "medium": {
+        "skuName": "Standard",
+        "skuCapacity": 1,
+        "skuFamily": "C"
+      },
+      "large": {
+        "skuName": "Standard",
+        "skuCapacity": 1,
+        "skuFamily": "C"
+      }
+    },
+    "skuName": "[variables('ts_size')[parameters('environmentSize')].skuName]",
+    "skuFamily": "[variables('ts_size')[parameters('environmentSize')].skuFamily]",
+    "skuCapacity": "[variables('ts_size')[parameters('environmentSize')].skuCapacity]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2017-10-01",
+      "type": "Microsoft.Cache/Redis",
+      "name": "[variables('accountName')]",
+      "location": "[variables('location')]",
+      "properties": {
+        "sku": {
+          "name": "[variables('skuName')]",
+          "family": "[variables('skuFamily')]",
+          "capacity": "[variables('skuCapacity')]"
+        },
+        "redisConfiguration": {
+          "maxclients": "1000",
+          "maxmemory-policy": "volatile-lru"
+        },
+        "enableNonSslPort": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,364 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "bastionPrivateIP": {
+      "type": "string"
+    },
+    "bffSubnetCIDR": {
+      "type": "string"
+    },
+    "backendSubnetCIDR": {
+      "type": "string"
+    },
+    "sitaIP": {
+      "type": "string",
+      "defaultValue": "57.188.38.0/24"
+    },
+    "sita_ATI_IP": {
+      "type": "string",
+      "defaultValue": "57.188.38.0/24"
+    }
+  },
+  "variables": {
+    "location": "[resourceGroup().location]",
+    "backendNetworkSecurityGroupName": "NSG-Backend",
+    "bffNetworkSecurityGroupName": "NSG-BFF",
+    "appGatewayNetworkSecurityGroupName": "NSG-AppGateway"
+  },
+  "resources": [
+    {
+      "name": "[variables('backendNetworkSecurityGroupName')]",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2017-06-01",
+      "location": "[variables('location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "Deny_All_Inbound",
+            "properties": {
+              "description": "block all traffic except what we've explicitly allowed",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Deny",
+              "priority": 300,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "GatewayHealth_All_to_65503-65534",
+            "properties": {
+              "description": "Allow Application Gateway Health communication within the vnet",
+              "access": "Allow",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "65503-65534",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "priority": 298,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Azure_LB_to_Any",
+            "properties": {
+              "description": "allow Azure LB to any port",
+              "access": "Allow",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "AzureLoadBalancer",
+              "destinationAddressPrefix": "*",
+              "priority": 299,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Bastion_to_RDP",
+            "properties": {
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "[parameters('bastionPrivateIP')]",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound",
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": []
+            }
+          },
+          {
+            "name": "ServiceFabric_LB_to_19080_19000",
+            "properties": {
+              "description": "allow port used by the fabric client management: portal + management",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRanges": [ "19080", "19000" ],
+              "sourceAddressPrefix": "AzureLoadBalancer",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 110,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "ServiceFabric_VNet_to_SFPorts",
+            "properties": {
+              "description": "allow ports within vnet that are used by the fabric to talk between nodes",
+              "access": "Allow",
+              "destinationAddressPrefix": "*",
+              "destinationPortRanges": [ "1025-1027", "49152-65534", "445" ],
+              "direction": "Inbound",
+              "priority": 140,
+              "protocol": "*",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "sourcePortRange": "*"
+            }
+          },
+          {
+            "name": "ASPlatform_BFF_to_BackendServices",
+            "properties": {
+              "description": "allow ports used by calls from BFF to backend services",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRanges": [ "21001-21020", "19081" ],
+              "sourceAddressPrefix": "[parameters('bffSubnetCIDR')]",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 210,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "ASPlatform_Backend_to_BackendServices",
+            "properties": {
+              "description": "allow ports used by calls from Backend to backend services",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRanges": [ "21001-21020", "19081" ],
+              "sourceAddressPrefix": "[parameters('backendSubnetCIDR')]",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 220,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+      ]
+    },
+    {
+      "name": "[variables('bffNetworkSecurityGroupName')]",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2017-06-01",
+      "location": "[variables('location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "Deny_All_Inbound",
+            "properties": {
+              "description": "block all traffic except what we've explicitly allowed",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Deny",
+              "priority": 300,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "GatewayHealth_All_to_65503-65534",
+            "properties": {
+              "description": "allow Application Gateway Health communication within the vnet",
+              "access": "Allow",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "65503-65534",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "priority": 298,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Azure_LB_to_Any",
+            "properties": {
+              "description": "allow Azure LB to any port",
+              "access": "Allow",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "AzureLoadBalancer",
+              "destinationAddressPrefix": "*",
+              "priority": 299,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Bastion_to_RDP",
+            "properties": {
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "[parameters('bastionPrivateIP')]",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "ServiceFabric_LB_to_19080_19000",
+            "properties": {
+              "description": "allow port used by the fabric client management",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRanges": [ "19080", "19000" ],
+              "sourceAddressPrefix": "AzureLoadBalancer",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 110,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "ServiceFabric_SITA_to_19080_19000",
+            "properties": {
+              "description": "allow port used by the fabric client management",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRanges": [ "19080", "19000" ],
+              "sourceAddressPrefix": "[parameters('sitaIP')]",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 120,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "ServiceFabric_SITA_ATI_to_19080_19000",
+            "properties": {
+              "description": "allow port used by the fabric client management",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRanges": [ "19080", "19000" ],
+              "sourceAddressPrefix": "[parameters('sita_ATI_IP')]",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 210,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "ServiceFabric_VNet_to_SFPorts",
+            "properties": {
+              "description": "allow ports within vnet that are used by the fabric to talk between nodes",
+              "access": "Allow",
+              "destinationAddressPrefix": "*",
+              "destinationPortRanges": [ "1025-1027", "49152-65534", "445" ],
+              "direction": "Inbound",
+              "priority": 140,
+              "protocol": "*",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "sourcePortRange": "*"
+            }
+          },
+          {
+            "name": "ASPlatform_VNet_to_FrontFacingServices",
+            "properties": {
+              "description": "allow requests coming from VNet to the Front Facing services. This is needed for AppGateway & healthcheck & ReverseProxy",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRanges": [ "22000-22999", "19081" ],
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 200,
+              "direction": "Inbound"
+            }
+          }
+
+        ]
+      },
+      "dependsOn": [
+      ]
+    },
+    {
+      "name": "[variables('appGatewayNetworkSecurityGroupName')]",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2017-06-01",
+      "location": "[variables('location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "GatewayHealth_All_to_65503-65534",
+            "properties": {
+              "description": "allow Application Gateway Health communication within the vnet",
+              "access": "Allow",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "65503-65534",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "priority": 298,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Azure_LB_to_Any",
+            "properties": {
+              "description": "allow Azure LB to any port",
+              "access": "Allow",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "AzureLoadBalancer",
+              "destinationAddressPrefix": "*",
+              "priority": 299,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Deny_All_Inbound",
+            "properties": {
+              "description": "block all traffic except what we've explicitly allowed",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Deny",
+              "priority": 300,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "ASPlatform_All_to_FrontFacingServices",
+            "properties": {
+              "description": "allow requests coming from All to the FF services",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRanges": [ "443" ],
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 200,
+              "direction": "Inbound"
+            }
+          }
+         ]
+      },
+      "dependsOn": [
+      ]
+    }
+  ],
+  "outputs": {
+  }
+}
