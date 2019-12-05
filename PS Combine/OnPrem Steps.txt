@@ -1,0 +1,23 @@
+# Copy WindowsServices Scripts Packages
+Source: $(dropPathApp)/ServiceFabricApplication
+Target: \\devbuild01\drops\NG-onPremise\$(Release.ReleaseName)
+
+#Stop/Remove NG windows services
+$(NGSetupFolder)\WIndowsServices\Scripts\NG-StopWindowsServices.ps1
+
+# Copy NG Application Setup Package
+Source: $(BuildDrop)\$(Build.DefinitionName)\$(Build.BuildNumber)\Drop
+Destination Folder: $(NGSetupFolder)
+
+# Generate ServiceConfiguration AppSettings
+$(NGSetupFolder)\ServiceFabricApplication\Scripts\GenerateServiceConfigurationSettings.ps1
+-- -targetInfrastructure OnPremise -environmentName $(OnPremiseEnvName) -applicationPackagePath $(appPackagePath) 
+	-databaseServer localhost -databaseUser invalidUser -databasePwd invalidPwd -verbose
+
+# Generate ApplicationParameters
+$(NGSetupFolder)\ServiceFabricApplication\Scripts\GenerateApplicationParameters.ps1
+-- -EnvironmentName $(OnPremiseEnvName) -targetInfrastructure OnPremise -toolPath $(ToolPathOnPremise) -verbose
+
+# Install Windows Services
+$(NGSetupFolder)\WindowsServices\Scripts\Install-AllServices-WithServiceFabricSettings.ps1
+-- -sfAppPackageRootFolder $(appPackagePath) -sfApplicationParameterFile $(appParameterFile)

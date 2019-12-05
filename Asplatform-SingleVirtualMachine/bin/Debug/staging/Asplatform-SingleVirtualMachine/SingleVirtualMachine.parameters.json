@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "adminUsername": {
+      "value": "Asadmin"
+    },
+    "dnsNameForPublicIP": {
+      "value": null
+    },
+    "adminPassword": {
+      "value": "T5;+5y+?{yKdA"
+    },
+    "environment": {
+      "value": "DEVELOPMENT"
+    },
+    "clientName": {
+      "value": "aa"
+    },
+    "EnvironmentSize": {
+      "value": "small"
+    },
+    "_artifactsLocation": {
+      "value": "https://deletemeplease.file.core.windows.net/asplatform-single-stageartifacts"
+    },
+    "_artifactsLocationSasToken": {
+      "value": "?sv=2019-02-02&ss=bfqt&srt=sco&sp=rwdlacup&se=2019-12-02T13:16:33Z&st=2019-12-02T05:16:33Z&spr=https&sig=dnQAkZblInHu1Srue1v6%2FDgOplH7YkZoEytbU1clB8M%3D"
+    }
+  }
+}

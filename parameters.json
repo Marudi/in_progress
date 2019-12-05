@@ -1,83 +1,81 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    "adminPassword": {
-      "reference": {
-        "keyVault": {
-          "id": "/subscriptions/e41175ed-6a67-4405-99ed-aba0079b6a5c/resourceGroups/DevOpsTeams/providers/Microsoft.KeyVault/vaults/PipelineCredentials"
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "clusterName": {
+            "value": "asplatform-demo"
         },
-        "secretName": "adminPassword"
-      }
-    },
-    "adminUsername": {
-      "value": "\u003ckeyVault: PipelineCredentials/adminUsername\u003e"
-    },
-    "environmentSize": {
-      "value": "medium"
-    },
-    "location": {
-      "value": "eastus"
-    },
-    "networkInterfaceName": {
-      "value": "VM-Bastion"
-    },
-    "networkSecurityGroupName": {
-      "value": "NSG-Bastion"
-    },
-    "osDiskType": {
-      "value": "Standard_LRS"
-    },
-    "publicIpAddressName": {
-      "value": "IP-Bastion"
-    },
-    "publicIpAddressSku": {
-      "value": "Basic"
-    },
-    "publicIpAddressType": {
-      "value": "Static"
-    },
-    "subnetName": {
-      "value": "Subnet-Management"
-    },
-    "virtualMachineName": {
-      "value": "VM-Bastion"
-    },
-    "virtualMachineRG": {
-      "value": "DevOpsPoc"
-    },
-    "virtualMachineSize": {
-      "value": "Standard_DS1_v2"
-    },
-    "virtualNetworkId": {
-      "value": "/subscriptions/e41175ed-6a67-4405-99ed-aba0079b6a5c/resourceGroups/ASPlatform-AzureDemo/providers/Microsoft.Network/virtualNetworks/VNet"
-    },
-    "autoShutdownTime": {
-      "value": "18:00"
-    },
-    "autoShutdownNotificationStatus": {
-      "value": "Enabled"
-    },
-    "domainNameLabel": {
-      "value": "sitaIP"
-    },
-    "appInsightsName": {
-      "value": "String"
-    },
-    "priceCode": {
-      "value": 1
-    },
-    "dailyQuota": {
-      "value": 50
-    },
-    "dailyQuotaResetTime": {
-      "value": 12
-    },
-    "warningThreshold": {
-      "value": 1
-    },
-    "requestSource": {
-      "value": "string"
+        "clusterLocation": {
+            "value": "centralus"
+        },
+        "computeLocation": {
+            "value": "centralus"
+        },
+        "adminUserName": {
+            "value": "Asadmin"
+        },
+        "adminPassword": {
+            "value": null
+        },
+        "nicName": {
+            "value": "NIC-asplatform-demo"
+        },
+        "publicIPAddressName": {
+            "value": "asplatform-demo-PubIP"
+        },
+        "dnsName": {
+            "value": "asplatform-demo"
+        },
+        "virtualNetworkName": {
+            "value": "VNet-asplatform-demo"
+        },
+        "lbName": {
+            "value": "LB-asplatform-demo"
+        },
+        "lbIPName": {
+            "value": "LBIP-asplatform-demo"
+        },
+        "applicationDiagnosticsStorageAccountName": {
+            "value": "sfdgasplatformdemo8385"
+        },
+        "supportLogStorageAccountName": {
+            "value": "sflogsasplatformdemo6663"
+        },
+        "sourceVaultValue": {
+            "value": "/subscriptions/8d961d31-3bf2-41db-b9f2-be8e38915552/resourceGroups/Development/providers/Microsoft.KeyVault/vaults/SampleCredentials"
+        },
+        "certificateUrlValue": {
+            "value": "https://samplecredentials.vault.azure.net/secrets/sfcert/c4868b4543a941d0b6b374e4b6a688f3"
+        },
+        "certificateThumbprint": {
+            "value": "B1EA9FF2070F7EA5F3078A8DB601BA0B17D80EDF"
+        },
+        "vmImageSku": {
+            "value": "2016-Datacenter-with-Containers"
+        },
+        "vmImageOffer": {
+            "value": "WindowsServer"
+        },
+        "nt0ephemeralStartPort": {
+            "value": 49152
+        },
+        "nt0ephemeralEndPort": {
+            "value": 65534
+        },
+        "nt0applicationStartPort": {
+            "value": 20000
+        },
+        "nt0applicationEndPort": {
+            "value": 30000
+        },
+        "nt0fabricTcpGatewayPort": {
+            "value": 19000
+        },
+        "nt0fabricHttpGatewayPort": {
+            "value": 19080
+        },
+        "nt0reverseProxyEndpointPort": {
+            "value": 19081
+        }
     }
-  }
 }

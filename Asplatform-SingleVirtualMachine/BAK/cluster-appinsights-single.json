@@ -1,0 +1,149 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "appType": {
+      "type": "string",
+      "defaultValue": "ASP.NET",
+      "allowedValues": [
+        "web",
+        "java",
+        "ASP.NET"
+      ],
+      "metadata": {
+        "description": "Enter the application type."
+      }
+    },
+    "requestSource": {
+      "type": "string",
+      "defaultValue": "IbizaAIExtension"
+    },
+    "priceCode": {
+      "type": "int",
+      "defaultValue": 1,
+      "allowedValues": [
+        1,
+        2
+      ],
+      "metadata": {
+        "description": "1 = Per GB (Basic), 2 = Per Node (Enterprise)"
+      }
+    },
+    "dailyQuota": {
+      "type": "int",
+      "defaultValue": 2,
+      "minValue": 1,
+      "metadata": {
+        "description": "Enter daily quota in GB."
+      }
+    },
+    "dailyQuotaResetTime": {
+      "type": "int",
+      "defaultValue": 12,
+      "metadata": {
+        "description": "Enter daily quota reset hour in UTC (0 to 23). Values outside the range will get a random reset hour."
+      }
+    },
+    "warningThreshold": {
+      "type": "int",
+      "defaultValue": 90,
+      "minValue": 1,
+      "maxValue": 100,
+      "metadata": {
+        "description": "Enter the % value of daily quota after which warning mail to be sent. "
+      }
+    },
+    "environmentSize": {
+      "type": "string",
+      "defaultValue": "small-dev",
+      "allowedValues": [
+        "small",
+        "small-dev",
+        "medium",
+        "medium-dev",
+        "large"
+      ],
+      "metadata": {
+        "description": "Medium for Standard deployes aand Large for higher work loads"
+      }
+    }
+  },
+  "variables": {
+    "appName": "[tolower(concat('asplatform','-',toUpper(resourceGroup().location)))]",
+    "location": "[resourceGroup().location]",
+    "apiVersionBilling": "2015-05-01",
+    "apiVersionComponents": "2014-08-01",
+    "priceArray": [
+      "Basic",
+      "Application Insights Enterprise"
+    ],
+    "pricePlan": "[take(variables('priceArray'),parameters('priceCode'))]",
+    "billingplan": "[concat(variables('appName'),'/', variables('pricePlan')[0])]",
+    "ts_size": {
+      "small-dev": {
+        "priceCode": 1,
+        "dailyQuota": 150,
+        "dailyQuotaResetTime": 23
+      },
+      "medium-dev": {
+        "priceCode": 1,
+        "dailyQuota": 250,
+        "dailyQuotaResetTime": 23
+      },
+      "small": {
+        "priceCode": 1,
+        "dailyQuota": 500,
+        "dailyQuotaResetTime": 23
+      },
+      "medium": {
+        "priceCode": 2,
+        "dailyQuota": 1000,
+        "dailyQuotaResetTime": 23
+      },
+      "large": {
+        "priceCode": 2,
+        "dailyQuota": 2000,
+        "dailyQuotaResetTime": 23
+      }
+    },
+    "priceCode": "[variables('ts_size')[parameters('environmentSize')].priceCode]",
+    "dailyQuota": "[variables('ts_size')[parameters('environmentSize')].dailyQuota]",
+    "dailyQuotaResetTime": "[variables('ts_size')[parameters('environmentSize')].dailyQuotaResetTime]"
+  },
+  "resources": [
+    {
+      "type": "microsoft.insights/components",
+      "kind": "[parameters('appType')]",
+      "name": "[variables('appName')]",
+      "apiVersion": "[variables('apiVersionComponents')]",
+      "location": "[variables('location')]",
+      "tags": {},
+      "properties": {
+        "ApplicationId": "[variables('appName')]",
+        "Application_Type": "[parameters('appType')]",
+        "HockeyAppToken": "",
+        "HockeyAppId": "",
+        "Flow_Type": "Redfield",
+        "Request_Source": "[parameters('requestSource')]"
+      }
+    },
+    {
+      "name": "[variables('billingplan')]",
+      "type": "microsoft.insights/components/CurrentBillingFeatures",
+      "location": "[variables('location')]",
+      "apiVersion": "[variables('apiVersionBilling')]",
+      "dependsOn": [
+        "[resourceId('microsoft.insights/components', variables('appName'))]"
+      ],
+      "properties": {
+        "CurrentBillingFeatures": "[variables('pricePlan')]",
+        "DataVolumeCap": {
+          "Cap": "[variables('dailyQuota')]",
+          "WarningThreshold": "[parameters('warningThreshold')]",
+          "ResetTime": "[variables('dailyQuotaResetTime')]"
+        }
+      }
+    }
+  ],
+  "outputs": {}
+}
