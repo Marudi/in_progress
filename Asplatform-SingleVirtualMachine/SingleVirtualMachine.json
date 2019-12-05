@@ -1,12 +1,12 @@
 ﻿{
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
   "parameters": {
-    "environment": {
+    "envName": {
       "allowedValues": [
-        "STAGING",
-        "DEVELOPMENT",
-        "PRODUCTION"
+        "STAGE",
+        "DEV",
+        "PROD"
       ],
       "type": "String",
       "metadata": {
@@ -45,13 +45,6 @@
         "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version."
       }
     },
-    "vmSize": {
-      "defaultValue": "Standard_A2_v2",
-      "type": "String",
-      "metadata": {
-        "description": "Size of the virtual machine."
-      }
-    },
     "EnvironmentSize": {
       "defaultValue": "small",
       "allowedValues": [
@@ -61,7 +54,7 @@
       ],
       "type": "String",
       "metadata": {
-        "description": "Medium for regular development. Large for Machine Learning development"
+        "description": "Small for regular development."
       }
     },
     "location": {
@@ -71,24 +64,62 @@
         "description": "Location for all resources."
       }
     },
-    "_artifactsLocation": {
-      "type": "String",
-      "defaultValue": "BlobEndpoint=https://deletemeplease.blob.core.windows.net/;QueueEndpoint=https://deletemeplease.queue.core.windows.net/;FileEndpoint=https://deletemeplease.file.core.windows.net/;TableEndpoint=https://deletemeplease.table.core.windows.net/;SharedAccessSignature=sv=2019-02-02&ss=bfqt&srt=sco&sp=rwdlacup&se=2019-12-02T13:16:33Z&st=2019-12-02T05:16:33Z&spr=https&sig=dnQAkZblInHu1Srue1v6%2FDgOplH7YkZoEytbU1clB8M%3D",
+    "Asplatform-DSCArchiveFolder":{
+      "type": "string",
+      "defaultValue": "",
       "metadata": {
-        "description": "Auto-generated container in staging storage account to receive post-build staging folder upload"
+        "description": "Location for storage of DSC configuration"
       }
     },
-    "_artifactsLocationSasToken": {
-      "type": "SecureString",
-      "defaultValue": "?sv=2019-02-02&ss=bfqt&srt=sco&sp=rwdlacup&se=2019-12-02T13:16:33Z&st=2019-12-02T05:16:33Z&spr=https&sig=dnQAkZblInHu1Srue1v6%2FDgOplH7YkZoEytbU1clB8M%3D",
+    "artifactsLocation":{
+      "type": "string",
+      "defaultValue": "https://asplatformresources.blob.core.windows.net/configuration?st=2019-12-05T15%3A29%3A21Z&se=2019-12-06T15%3A29%3A21Z&sp=rcl&sv=2018-03-28&sr=c&sig=3q6gu0xD7gmMfyZxtPF0DsiI6jRTfwBO4vaqPwp8TSI%3D",
       "metadata": {
-        "description": "Auto-generated token to access _artifactsLocation"
+        "description": "Exact folder location"
+      }
+    },
+
+  //https://asplatformresources.blob.core.windows.net/configuration?st=2019-12-04T21%3A48%3A31Z&se=2021-07-23T21%3A48%3A00Z&sp=racwdl&sv=2018-03-28&sr=c&sig=Bm3pxbbe4x2BSzlCkdrpSclVWgAp44FWVdFTRk2Mm9c%3D
+
+    "artifactsLocationSasToken":{
+      "type": "string",
+      "defaultValue": "sv=2019-02-02&ss=b&srt=sco&sp=rwdlac&se=2022-05-20T22:47:23Z&st=2019-12-05T15:47:23Z&spr=https,http&sig=%2BongMRHELBwGTUe9bSY8%2F57c0HP80vYpQJCy2s4wMFY%3D",
+      "metadata": {
+        "description": "SAS token for the Blob storage"
+      }
+    },
+    "Asplatform-DSCfile":{
+      "type": "string",
+      "defaultValue": "Asplatform-DSC.ps1",
+      "metadata": {
+        "description": "DSC configuration file name"
+      }
+    },
+    "hostingResourceGroupName": {
+      "defaultValue": "ASPlatform-Central",
+      "type": "String",
+      "metadata": {
+        "description": "ResourceGroup containing the hosting VNet."
+      }
+    },
+    "hostingVNetName": {
+      "defaultValue": "ASPlatform-VNet",
+      "type": "String",
+      "metadata": {
+        "description": "VNet that will be hosting this VM."
+      }
+    },
+    "hostingSubnetName": {
+      "defaultValue": "ASPlatform_NG_Subnet",
+      "type": "String",
+      "metadata": {
+        "description": "Subnet that will be hosting this VM."
       }
     }
+
   },
   "variables": {
-    "suffix": "[uniqueString(resourceGroup().id, resourceGroup().location)]",
-    "VMName": "[concat('SOA-ASP-', parameters('environment'),'-',parameters('clientName'), '-01')]",
+    "VMName": "[toUpper(concat('SOA-', parameters('envName'),'-',parameters('clientName'), '-01'))]",
     "ts_size": {
       "small": {
         "VMSize": "Standard_A1_v2"
@@ -100,188 +131,202 @@
         "VMSize": "Standard_D2_v2"
       }
     },
-    "centralVnetName": "VNet-asplatform-demo",
-    "subnetName": "Subnet-0",
+    "hostingVirtualNetworkName": "[concat('resourceGroups/', parameters('hostingResourceGroupName'), '/providers/Microsoft.Network/', parameters('hostingVNetName'))]",
+    "vnetID": "[resourceId(parameters('hostingResourceGroupName'), 'Microsoft.Network/virtualNetworks', parameters('hostingVNetName'))]",
 
-    "centralResourceGroupName": "DeleteME",
-    "centralVirtualNetworkName": "[concat('resourceGroups/', variables('centralResourceGroupName'), '/providers/Microsoft.Network/', variables('centralVnetName'))]",
-    "vnetID": "[resourceId(variables('centralResourceGroupName'), 'Microsoft.Network/virtualNetworks', variables('centralVnetName'))]",
-
-    "subnet1Ref": "[concat(variables('vnetID'),'/subnets/', variables('subnetName'))]",
-    "addressPrefix": "[concat(variables('centralResourceGroupName'),'/Microsoft.Network/virtualNetworks/', variables('centralVirtualNetworkName'), '/subnets/', variables('subnetName'))]",
-    "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('centralVnetName'), variables('subnetName'))]",
-    "dnsLabelPrefix": "[concat('soa-asp-', parameters('clientName'))]",
-    "Asplatform-DSCfile": "Asplatform-DSC.zip",
-    "Asplatform-DSCArchiveFolder": "DSC",
-    "networkSecurityGroupName": "[concat(parameters('clientName'),'-NSG')]",
-    "nicName": "[concat(parameters('clientName'), '-nic')]",
-    "publicIPAddressName": "[concat(parameters('clientName'), '-pubip')]",
+    "subnet1Ref": "[concat(variables('vnetID'),'/subnets/', parameters('hostingSubnetName'))]",
+    "networkSecurityGroupName": "[toUpper(concat('NG-', parameters('clientName'),'-NSG'))]",
+    "nicName": "[concat('NG-', parameters('clientName'), '-nic')]",
     "storageAccountName": "[toLower(concat(parameters('clientName'), 'storage',uniquestring(resourceGroup().id)))]"
   },
-  "resources": [
-    {
-      "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2018-11-01",
-      "name": "[variables('storageAccountName')]",
-      "location": "[parameters('location')]",
-      "sku": {
-        "name": "Standard_LRS"
-      },
-      "kind": "Storage",
-      "properties": {}
-    },
-    {
-      "type": "Microsoft.Network/publicIPAddresses",
-      "apiVersion": "2018-11-01",
-      "name": "[variables('publicIPAddressName')]",
-      "location": "[parameters('location')]",
-      "properties": {
-        "publicIPAllocationMethod": "Dynamic",
-        "dnsSettings": {
-          "domainNameLabel": "[variables('dnsLabelPrefix')]"
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2019-08-01",
-      "name": "[variables('networkSecurityGroupName')]",
-      "location": "[parameters('location')]",
-      "properties": {
-        "securityRules": [
-          {
-            "name": "default-allow-3389",
-            "properties": {
-              "priority": 1000,
-              "access": "Allow",
-              "direction": "Inbound",
-              "destinationPortRange": "3389",
-              "protocol": "Tcp",
-              "sourcePortRange": "*",
-              "sourceAddressPrefix": "*",
-              "destinationAddressPrefix": "*"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "2018-11-01",
-      "name": "[variables('nicName')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
-        "[resourceId('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "privateIPAllocationMethod": "Dynamic",
-              "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-              },
-              "subnet": {
-                "id": "[variables('subnet1Ref')]"
-              }
-            }
-          }
-        ],
-        "networkSecurityGroup": {
-          "id": "[resourceId('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Compute/virtualMachines",
-      "apiVersion": "2018-10-01",
-      "name": "[variables('VMName')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
-      ],
-      "properties": {
-        "hardwareProfile": {
-          "vmSize": "[variables('ts_size')[parameters('EnvironmentSize')].VMSize]"
-        },
-        "osProfile": {
-          "computerName": "[variables('VMName')]",
-          "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPassword')]"
-        },
-        "storageProfile": {
-          "imageReference": {
-            "publisher": "MicrosoftWindowsServer",
-            "offer": "WindowsServer",
-            "sku": "[parameters('windowsOSVersion')]",
-            "version": "latest"
-          },
-          "osDisk": {
-            "createOption": "FromImage"
-          },
-          "dataDisks": [
-            {
-              "diskSizeGB": 1023,
-              "lun": 0,
-              "createOption": "Empty"
-            }
-          ]
-        },
-        "networkProfile": {
-          "networkInterfaces": [
-            {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
-            }
-          ]
-        },
-        "diagnosticsProfile": {
-          "bootDiagnostics": {
-            "enabled": true,
-            "storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))).primaryEndpoints.blob]"
-          }
-        }
-      },
-      "resources": [
+    "resources": [
         {
-          "type": "extensions",
-          "apiVersion": "2018-03-30",
-          "name": "Microsoft.Powershell.DSC",
-          "location": "[parameters('location')]",
-          "dependsOn": [
-            "[resourceId('Microsoft.Compute/virtualMachines', variables('VMName'))]"
-          ],
-          "tags": {
-            "displayName": "Asplatform-VirtualMachineDSC"
-          },
-          "properties": {
-            "publisher": "Microsoft.Powershell",
-            "type": "DSC",
-            "typeHandlerVersion": "2.9",
-            "autoUpgradeMinorVersion": true,
-            "settings": {
-              "configuration": {
-                "url": "[concat(parameters('_artifactsLocation'), '/', variables('Asplatform-DSCArchiveFolder'), '/', variables('Asplatform-DSCfile'))]",
-                "script": "Asplatform-VirtualMachineDSC.ps1",
-                "function": "Main"
-              },
-              "configurationArguments": {
-                "nodeName": "[variables('VMName')]"
-              }
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2018-11-01",
+            "name": "[variables('storageAccountName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Standard_LRS"
             },
-            "protectedSettings": {
-              "configurationUrlSasToken": "[parameters('_artifactsLocationSasToken')]"
+            "kind": "Storage",
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2019-08-01",
+            "name": "[variables('networkSecurityGroupName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+              "securityRules": [
+                {
+                  "name": "Deny_All_Inbound",
+                  "properties": {
+                    "description": "block all traffic except what we've explicitly allowed",
+                    "protocol": "*",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "*",
+                    "sourceAddressPrefix": "*",
+                    "destinationAddressPrefix": "*",
+                    "access": "Deny",
+                    "priority": 300,
+                    "direction": "Inbound"
+                  }
+                },
+                {
+                  "name": "GatewayHealth_All_to_65503-65534",
+                  "properties": {
+                    "description": "Allow Application Gateway Health communication within the vnet",
+                    "access": "Allow",
+                    "protocol": "*",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "65503-65534",
+                    "sourceAddressPrefix": "*",
+                    "destinationAddressPrefix": "*",
+                    "priority": 298,
+                    "direction": "Inbound"
+                  }
+                },
+                {
+                  "name": "Azure_LB_to_Any",
+                  "properties": {
+                    "description": "Allow Azure LB to any port",
+                    "access": "Allow",
+                    "protocol": "*",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "*",
+                    "sourceAddressPrefix": "AzureLoadBalancer",
+                    "destinationAddressPrefix": "*",
+                    "priority": 299,
+                    "direction": "Inbound"
+                  }
+                },
+                {
+                  "name": "ASPlatform_AppGateway_to_NG",
+                  "properties": {
+                    "description": "Allow requests coming from AppGateway to the Front Facing services. This is needed for AppGateway & healthcheck & ReverseProxy",
+                    "protocol": "*",
+                    "sourcePortRange": "*",
+                    "destinationPortRanges": [ "443" ],
+                    "sourceAddressPrefix": "VirtualNetwork",
+                    "destinationAddressPrefix": "*",
+                    "access": "Allow",
+                    "priority": 200,
+                    "direction": "Inbound"
+                  }
+                }
+              ]
             }
-          }
-        }
-      ]
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2018-11-01",
+            "name": "[variables('nicName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                             "subnet": {
+                                "id": "[variables('subnet1Ref')]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
+                }
+            }           
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2018-10-01",
+            "name": "[variables('VMName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[variables('ts_size')[parameters('EnvironmentSize')].VMSize]"
+                },
+                "osProfile": {
+                    "computerName": "[variables('VMName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "[parameters('windowsOSVersion')]",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "createOption": "FromImage"
+                    },
+                    "dataDisks": [
+                        {
+                            "diskSizeGB": 1023,
+                            "lun": 0,
+                            "createOption": "Empty"
+                        }
+                    ]
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))).primaryEndpoints.blob]"
+                    }
+                }
+            },
+            "resources": [
+              {
+                "type": "extensions",
+                "apiVersion": "2018-10-01",
+                "name": "Microsoft.Powershell.DSC",
+                "location": "[parameters('location')]",
+                "dependsOn": [
+                  "[resourceId('Microsoft.Compute/virtualMachines', variables('VMName'))]"
+                ],
+                "tags": {
+                  "displayName": "Asplatform-DSC"
+                },
+                "properties": {
+                  "publisher": "Microsoft.Powershell",
+                  "type": "DSC",
+                  "typeHandlerVersion": "2.9",
+                  "autoUpgradeMinorVersion": true,
+                  "settings": {
+                    "configuration": {
+                      "url": "[concat(parameters('artifactsLocation'), '/', parameters('Asplatform-DSCArchiveFolder'), '/', parameters('Asplatform-DSCfile'))]",
+                      "script": "Asplatform-DSC.ps1",
+                      "function": "Main"
+                    },
+                    "configurationArguments": {
+                      "nodeName": "[variables('VMName')]"
+                    }
+                  },
+                  "protectedSettings": {
+                    "configurationUrlSasToken": "[parameters('artifactsLocationSasToken')]"
+                    }
+                  }
+                }
+                
+              ]
+            }
+    ],
+    "outputs": {
     }
-  ],
-  "outputs": {
-    "hostname": {
-      "type": "String",
-      "value": "[reference(variables('publicIPAddressName')).dnsSettings.fqdn]"
-    }
-  }
 }
