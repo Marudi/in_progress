@@ -80,7 +80,7 @@
       <IncludeAssets>All</IncludeAssets>
     </PackageReference>
     <PackageReference Include="System.Net.Http" Version="4.3.3" />
-    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.0" />
+    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Web.config">
