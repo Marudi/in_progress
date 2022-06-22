@@ -76,7 +76,7 @@
       <Version>1.0.8</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
-      <Version>9.0.1</Version>
+      <Version>13.0.1</Version>
       <IncludeAssets>All</IncludeAssets>
     </PackageReference>
     <PackageReference Include="System.Net.Http" Version="4.3.3" />
